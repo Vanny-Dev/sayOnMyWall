@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vanny's Wall</title>
     <style>
-        /* Add any additional styles here */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -86,9 +85,6 @@
 
     <script>
         // Firebase configuration
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-
         const firebaseConfig = {
             apiKey: "AIzaSyDyh2DWVQb-8xlV78jh0JMhG5c97cP1dKA",
             authDomain: "vanny-wall.firebaseapp.com",
@@ -100,15 +96,15 @@
         };
 
         // Initialize Firebase and Firestore
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
         // Fetch messages from Firestore
         async function fetchMessages() {
             const messagesDisplay = document.getElementById('messagesDisplay');
             messagesDisplay.innerHTML = ''; // Clear previous messages
 
-            const snapshot = await getDocs(collection(db, 'messages'));
+            const snapshot = await db.collection('messages').get();
             snapshot.forEach((doc) => {
                 const messageData = doc.data();
                 const messageDiv = document.createElement('div');
@@ -124,7 +120,7 @@
             const message = messageInput.value;
 
             if (message) {
-                await addDoc(collection(db, 'messages'), { content: message });
+                await db.collection('messages').add({ content: message });
                 messageInput.value = '';  // Clear input
                 fetchMessages();  // Reload messages
             }
