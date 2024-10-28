@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanny's Wall</title>
+    <style>
+        /* Add any additional styles here */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .message-box {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .message-box textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+        }
+        .message-box button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .message-box button:hover {
+            background-color: #45a049;
+        }
+        .messages-display {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+        }
+        .messages-display .message {
+            background-color: #e7e7e7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Vanny's Wall</h1>
+
+    <div class="message-box">
+        <textarea id="messageInput" placeholder="Type your anonymous message here..."></textarea>
+        <button onclick="submitMessage()">Send Message</button>
+    </div>
+
+    <div class="messages-display" id="messagesDisplay">
+        <!-- Displayed messages will appear here -->
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyh2DWVQb-8xlV78jh0JMhG5c97cP1dKA",
+            authDomain: "vanny-wall.firebaseapp.com",
+            projectId: "vanny-wall",
+            storageBucket: "vanny-wall.appspot.com",
+            messagingSenderId: "821336634952",
+            appId: "1:821336634952:web:b90797f33e3bab1996ca7d",
+            measurementId: "G-RY8KDK4FYK"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
+
+        // Fetch messages from Firestore
+        async function fetchMessages() {
+            const messagesDisplay = document.getElementById('messagesDisplay');
+            messagesDisplay.innerHTML = ''; // Clear previous messages
+
+            const snapshot = await db.collection('messages').get();
+            snapshot.forEach((doc) => {
+                const messageData = doc.data();
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.textContent = messageData.content;
+                messagesDisplay.appendChild(messageDiv);
+            });
+        }
+
+        // Submit a new message to Firestore
+        async function submitMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+
+            if (message) {
+                await db.collection('messages').add({ content: message });
+                messageInput.value = '';  // Clear input
+                fetchMessages();  // Reload messages
+            }
+        }
+
+        // Fetch messages when the page loads
+        window.onload = fetchMessages;
+    </script>
+</body>
+</html>
