@@ -80,12 +80,15 @@
         <!-- Displayed messages will appear here -->
     </div>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
 
     <script>
         // Firebase configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyDyh2DWVQb-8xlV78jh0JMhG5c97cP1dKA",
             authDomain: "vanny-wall.firebaseapp.com",
@@ -96,16 +99,16 @@
             measurementId: "G-RY8KDK4FYK"
         };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+        // Initialize Firebase and Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         // Fetch messages from Firestore
         async function fetchMessages() {
             const messagesDisplay = document.getElementById('messagesDisplay');
             messagesDisplay.innerHTML = ''; // Clear previous messages
 
-            const snapshot = await db.collection('messages').get();
+            const snapshot = await getDocs(collection(db, 'messages'));
             snapshot.forEach((doc) => {
                 const messageData = doc.data();
                 const messageDiv = document.createElement('div');
@@ -121,7 +124,7 @@
             const message = messageInput.value;
 
             if (message) {
-                await db.collection('messages').add({ content: message });
+                await addDoc(collection(db, 'messages'), { content: message });
                 messageInput.value = '';  // Clear input
                 fetchMessages();  // Reload messages
             }
